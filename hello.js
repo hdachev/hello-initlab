@@ -8,19 +8,22 @@ if( env.REDISTOGO_URL )
       , host = config[ 2 ]
       , port = config[ 3 ];
 
+    console.log('Connecting to redis as\n%s@%s:%s'
+              , pass, host, port);
+
     redis = require( 'redis' ).createClient( port, host );
     redis.auth( pass );
   }
-  ( /:(.+)@(.+):([0-9]+)/.exec( process.env.REDISTOGO_URL ) ) );
+  ( /.*:(.+)@(.+):([0-9]+)/.exec( env.REDISTOGO_URL ) ) );
 
 http.createServer(function (req, res) {
   console.log( req.url );
   res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.write('Hello Initlab!\n');
+  res.write('hello initlab!\n');
 
   if( redis )
-    return redis.INCR( 'pageviews', function( err, count ) {
-      res.end(count + ' pageviews and counting!\n');
+    return redis.INCR( 'hits', function( err, count ) {
+      res.end(count + ' hits and counting!\n');
     });
 
   res.end('btw no redis here.\n');

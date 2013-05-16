@@ -2,6 +2,5 @@
 , "version": "0.0.1"
 , "dependencies": {
 	"redis": "0.8.x"
-  , "hiredis": "0.1.x"
   }
 }
