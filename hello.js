@@ -1,11 +1,26 @@
-var http = require('http');
+var http = require('http')
+  , env = process.env
+  , redis;
+
+if( env.REDISTOGO_URL )
+  ( function( config ) {
+    redis = require( 'redis' ).createClient( config[ 3 ], config[ 2 ] );
+    redis.auth( config[ 1 ] );
+  }
+  ( /.*:(.*)@(.*):(.*)/.exec( process.env.REDISTOGO_URL ) ) );
 
 http.createServer(function (req, res) {
+  console.log( req.url );
   res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Hello Initlab\n');
+  res.write('Hello Initlab!\n');
 
-  console.log( new Date(), req.url );
+  if( redis )
+    return redis.INCR( 'pageviews', function( err, count ) {
+      res.end(count + ' pageviews and counting!\n');
+    });
 
-}).listen( process.env.PORT || 8000 );
+  res.end('btw no redis here.\n');
+
+}).listen( env.PORT || 8000 );
 
 console.log('Server running at http://127.0.0.1:1337/');
