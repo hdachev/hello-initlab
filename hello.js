@@ -1,6 +1,10 @@
 var http = require('http')
   , env = process.env
-  , redis;
+  , redis
+
+    // boot id
+  , id = Math.ceil( Math.random() * 0xffff )
+      .toString( 16 );
 
 if( env.REDISTOGO_URL )
   ( function( config ) {
@@ -20,13 +24,14 @@ http.createServer(function (req, res) {
   console.log( req.url );
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.write('hello initlab!\n');
+  res.write('this is server #' + id + '\n');
 
   if( redis )
     return redis.INCR( 'hits', function( err, count ) {
       res.end(count + ' hits and counting!\n');
     });
 
-  res.end('btw no redis here.\n');
+  res.end('no redis here.\n');
 
 }).listen( env.PORT || 8000 );
 
