@@ -4,10 +4,14 @@ var http = require('http')
 
 if( env.REDISTOGO_URL )
   ( function( config ) {
-    redis = require( 'redis' ).createClient( config[ 3 ], config[ 2 ] );
-    redis.auth( config[ 1 ] );
+    var pass = config[ 1 ]
+      , host = config[ 2 ]
+      , port = config[ 3 ];
+
+    redis = require( 'redis' ).createClient( port, host );
+    redis.auth( pass );
   }
-  ( /.*:(.*)@(.*):(.*)/.exec( process.env.REDISTOGO_URL ) ) );
+  ( /:(.+)@(.+):([0-9]+)/.exec( process.env.REDISTOGO_URL ) ) );
 
 http.createServer(function (req, res) {
   console.log( req.url );
